@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter.messagebox import askyesno
-from tkinter import messagebox
-import func
+from tkinter import messagebox, Toplevel
+
 import speech_recognition as sr
 from datetime import datetime
+import func
+import numpad
 
 data_lst = []
 
@@ -158,32 +160,63 @@ def make_gui(r):
         notification_window.transient(root)
         notification_window.grab_set()
 
-        return notification_window
-
+        return notification_window  
+    
     # 버튼 클릭 시 실행될 함수
     def button_action(button_number):
+        global data_lst
 
         print(f"\n[디버깅] 버튼 {button_number}이 눌렸습니다.")
         print(f"[디버깅] type: {type(buttons[button_number])}")
 
-        # 알림 창 표시
-        try:
-            notification_window = show_notification(root, f"[{button_texts[button_number]}] \n 음성 인식 중...")
-            root.update()
+        if button_number == 1 or button_number == 4:
+            a = numpad.open_contact_options(root, data_lst[button_number])
+            print(f"[디버깅] 넘어온 contact_number: {a}")
 
-            audio = func.capture_audio(r)
-            txt = func.minning_word(r, audio)
+            if a == 'voice_start': # 음성인식 시작
+                # 알림 창 표시
+                try:
+                    notification_window = show_notification(root, f"[{button_texts[button_number]}] \n 음성 인식 중...")
+                    root.update()
 
-            # 버튼 텍스트 변경
-            buttons[button_number].config(text=f'{button_texts[button_number]}: {txt}')
-            
-            # 음성인식 데이터 저장
-            data_lst[button_number] = txt
+                    audio = func.capture_audio(r)
+                    txt = func.minning_word(r, audio)
 
-        finally:
-            # 알림 창 닫기
-            notification_window.destroy()
+                    # 버튼 텍스트 변경
+                    buttons[button_number].config(text=f'{button_texts[button_number]}: {txt}')
+                    
+                    # 음성인식 데이터 저장
+                    data_lst[button_number] = txt
 
+                finally:
+                    # 알림 창 닫기
+                    notification_window.destroy()
+
+            else:
+                # 버튼 텍스트 변경
+                buttons[button_number].config(text=f'{button_texts[button_number]}: {a}')
+                
+                # 음성인식 데이터 저장
+                data_lst[button_number] = a
+
+        else:
+            # 알림 창 표시
+            try:
+                notification_window = show_notification(root, f"[{button_texts[button_number]}] \n 음성 인식 중...")
+                root.update()
+
+                audio = func.capture_audio(r)
+                txt = func.minning_word(r, audio)
+
+                # 버튼 텍스트 변경
+                buttons[button_number].config(text=f'{button_texts[button_number]}: {txt}')
+                
+                # 음성인식 데이터 저장
+                data_lst[button_number] = txt
+
+            finally:
+                # 알림 창 닫기
+                notification_window.destroy()
         
     # 창 크기 변경 시 버튼 크기 동적 조정
     def resize_buttons(event):

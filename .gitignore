@@ -200,4 +200,7 @@ $RECYCLE.BIN/
 *.lnk
 *.txt
 
+#User Definition
+!*
+
 # End of https://www.toptal.com/developers/gitignore/api/python,windows
