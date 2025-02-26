@@ -92,6 +92,8 @@ def make_gui(r):
             all_clear()
             func.filtering_noise(r)
 
+            messagebox.showinfo("Success", "성공적으로 제출되었습니다!")
+
         else:
             print(f"[디버깅] 제출 취소")
 
@@ -200,10 +202,11 @@ def make_gui(r):
     def output_by_txt():
         now = datetime.now()
         file_name = now.strftime("%Y-%m-%d_%H;%M;%S")
+        date = now.strftime("%Y-%m-%d %H시%M분%S초")
 
         try:
             with open (file_name+".txt", "w", encoding="utf-8") as file:
-                file.write(f"[일자]: {file_name}\n")
+                file.write(f"[일자]: {date}\n")
 
                 for i in range(len(button_texts)):
                     if i == 3 or i == 6:
@@ -212,7 +215,7 @@ def make_gui(r):
                     file.write(f"[{button_texts[i]}]: {data_lst[i]}\n")
                 file.write(f"[결제 방식]: {radio_var.get()}\n")
             print(f"[디버깅] 데이터가 '{file_name}' 파일에 저장되었습니다.")
-            messagebox.showinfo("Success", "성공적으로 제출되었습니다!")
+            
             
 
         except Exception as e:
