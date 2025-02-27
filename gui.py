@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter.messagebox import askyesno
-from tkinter import messagebox, Toplevel
+from tkinter import messagebox, Toplevel, Menu
 
 import speech_recognition as sr
 from datetime import datetime
 import func
 import numpad
+import save_file
 
 data_lst = []
 
@@ -77,6 +78,10 @@ def make_gui(r):
     )
     radio2.grid(row=len(button_texts), column=0, pady=10, padx=10,sticky="e")  # 두 번째 라디오 버튼
 
+    def get_saved_path():
+        saved_path = save_file.open_login_gui(root)
+        print(f"[디버깅] saved_path: {saved_path}")
+
     # 선택된 옵션 출력 함수
     def show_selected_option():
         global data_lst
@@ -90,6 +95,9 @@ def make_gui(r):
 
             print(f"[디버깅] 결제 방식: {radio_var.get()}")
 
+            # saved_path = save_file.show_path_gui(root)
+            # print(f"[디버깅] saved_path: {saved_path}")
+            
             output_by_txt()
             all_clear()
             func.filtering_noise(r)
@@ -98,8 +106,6 @@ def make_gui(r):
 
         else:
             print(f"[디버깅] 제출 취소")
-
-        # print(f"[디버깅] data_lst: {data_lst}")
 
     # 확인 버튼 생성 및 배치
     confirm_button = tk.Button(
@@ -253,6 +259,11 @@ def make_gui(r):
 
         except Exception as e:
             print(f"[ERROR] 파일 저장 중 에러 발생: {e}")
+
+    # Menu 생성
+    menutree = Menu(root)
+    root.config(menu=menutree)
+    menutree.add_command(label="파일 저장경로 설정", command=get_saved_path)
 
     root.bind("<Configure>", resize_buttons)  # 창 크기 변경 이벤트 바인딩
 

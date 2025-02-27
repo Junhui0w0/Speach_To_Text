@@ -41,6 +41,7 @@ def open_numpad(root, options_window):
     def confirm_input():
         global contact_number
         contact_number = phone_var.get()
+        print(f"[DEBUG] options_window 타입: {type(options_window)}")
         print(f"[DEBUG] 입력된 연락처: {contact_number}")
         numpad.destroy()  # 넘패드 창 닫기
         options_window.destroy()  # 옵션 창도 닫기
@@ -142,40 +143,6 @@ def open_numpad(root, options_window):
         width=15,
         height=2
     ).grid(row=5, column=0, columnspan=3)
-
-# def open_contact_options(root, cur_num):
-#     """연락처 옵션 GUI"""
-#     global contact_number
-#     contact_number = cur_num
-
-#     options_window = Toplevel(root)
-#     options_window.title("연락처 옵션")
-#     options_window.geometry("300x200")
-#     options_window.resizable(False, False)
-
-#     tk.Button(
-#         options_window,
-#         text="음성인식",
-#         font=("맑은고딕", 15),
-#         command=lambda: start_voice_recognition(options_window),
-#         width=20,
-#         height=2
-#     ).pack(pady=10)
-
-#     tk.Button(
-#         options_window,
-#         text="키패드",
-#         font=("맑은고딕", 15),
-#         command=lambda: open_numpad(root, options_window),
-#         width=20,
-#         height=2
-#     ).pack(pady=10)
-
-#     # 창이 닫힐 때까지 대기
-#     options_window.wait_window()
-
-#     return contact_number
-
 
 def open_contact_options(root, cur_num):
     """연락처 옵션 GUI"""
