@@ -9,6 +9,7 @@ import numpad
 import save_file
 
 data_lst = []
+saved_path = ""
 
 def make_gui(r):
     global data_lst
@@ -79,6 +80,7 @@ def make_gui(r):
     radio2.grid(row=len(button_texts), column=0, pady=10, padx=10,sticky="e")  # 두 번째 라디오 버튼
 
     def get_saved_path():
+        global saved_path
         saved_path = save_file.open_login_gui(root)
         print(f"[디버깅] saved_path: {saved_path}")
 
@@ -239,12 +241,24 @@ def make_gui(r):
             buttons[i].config(text=f"{button_texts[i]}")
 
     def output_by_txt():
+        global saved_path
+
+        with open("saved_root.txt", "r", encoding="utf-8") as f:
+            saved_path = f.readline()
+
+        print(f"[디버깅] output_bt_txt: 저장된 saved_path: {saved_path}")
+
         now = datetime.now()
-        file_name = now.strftime("%Y-%m-%d_%H;%M;%S")
-        date = now.strftime("%Y-%m-%d %H시%M분%S초")
+        file_name = now.strftime("%Y-%m-%d_%H;%M;%S") # 파일 이름
+        date = now.strftime("%Y-%m-%d %H시%M분%S초") # 메모장에 적을 일자
 
         try:
-            with open (file_name+".txt", "w", encoding="utf-8") as file:
+            if saved_path == "":
+                save_root = file_name + ".txt"
+            else:
+                save_root = saved_path + '/' + file_name + ".txt"
+
+            with open (save_root, "w", encoding="utf-8") as file:
                 file.write(f"[일자]: {date}\n")
 
                 for i in range(len(button_texts)):
@@ -254,11 +268,9 @@ def make_gui(r):
                     file.write(f"[{button_texts[i]}]: {data_lst[i]}\n")
                 file.write(f"[결제 방식]: {radio_var.get()}\n")
             print(f"[디버깅] 데이터가 '{file_name}' 파일에 저장되었습니다.")
-            
-            
 
         except Exception as e:
-            print(f"[ERROR] 파일 저장 중 에러 발생: {e}")
+            print(f"[ERROR: output_by_txt] 파일 저장 중 에러 발생: {e}")
 
     # Menu 생성
     menutree = Menu(root)
