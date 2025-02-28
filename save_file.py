@@ -5,7 +5,15 @@ from tkinter import messagebox
 
 saved_path = ""
 
+def set_start_save_path(path):
+    with open("saved_root.txt", "r", encoding="utf-8") as f:
+        path = f.readline()
+
+    return path
+
 def open_login_gui(root):
+    global saved_path
+
     pw_window = Toplevel(root)
     pw_window.title("관리자 인증")
     pw_window.resizable(False,False)
@@ -99,12 +107,15 @@ def open_set_directory(path_lbl, window):
         return saved_path
     
 
-def sending_save_path(window, pw_win):
+def sending_save_path(window, pw_win, path):
+    global saved_path
+    
     print(f"[디버깅] saved_path 전송 완료")
+    saved_path = path
     
     #경로 저장
     with open("saved_root.txt", "w+", encoding="utf-8") as f:
-        f.write(saved_path)
+        f.write(path)
 
     window.destroy()
     pw_win.destroy()
@@ -185,7 +196,7 @@ def show_path_gui(root, pw_win):
         # width=all_width//10,
         # height=all_height//20,
         # justify="left",
-        command=lambda: sending_save_path(save_path_window, pw_win)
+        command=lambda: sending_save_path(save_path_window, pw_win, saved_path)
     )
     confirm_btn.grid(row=3, column=0,columnspan=2, padx=10, pady=10, sticky='nsew')
 

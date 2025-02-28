@@ -7,7 +7,7 @@ def filtering_noise(recognizer):
     with sr.Microphone() as source:
         print("\n[디버깅] 배경 소음 분석 중..")
         recognizer.adjust_for_ambient_noise(source, duration=2)
-        recognizer.pause_threshold = 1.2
+        recognizer.pause_threshold = 1.0
         print("[디버깅] 배경 소음 분석 완료!")
 
 # 음성 캡처 함수

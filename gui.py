@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter.messagebox import askyesno
 from tkinter import messagebox, Toplevel, Menu
+import time
+import os
 
 import speech_recognition as sr
 from datetime import datetime
@@ -9,10 +11,11 @@ import numpad
 import save_file
 
 data_lst = []
+pay_option = ""
 saved_path = ""
 
 def make_gui(r):
-    global data_lst
+    global data_lst, pay_option
 
     # 메인 윈도우 생성
     root = tk.Tk()
@@ -44,58 +47,72 @@ def make_gui(r):
             highlightbackground="black",  # 테두리 색상
             highlightthickness=2          # 테두리 두께
         )
-        button.grid(row=i, column=0, padx=10, pady=10, sticky="nsew")  # 그리드 배치
+        button.grid(row=i, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")  # 그리드 배치
         buttons.append(button)
 
-    # 라디오 버튼 변수 생성
-    radio_var = tk.StringVar(value="착불")  # 기본 선택값 설정
 
-    # 라디오 버튼 생성 및 배치 (1행 2열)
-    radio1 = tk.Radiobutton(
-        root,
-        text="착불",
-        font=("맑은고딕", 30),
-        variable=radio_var,
-        value="착불",
-        width=button_width // 20,  # Tkinter에서 width는 문자 단위
-        height=button_height // 20,  # Tkinter에서 height는 행 단위
-        relief="solid",  # 테두리 스타일 (solid: 실선)
-        highlightbackground="black",  # 테두리 색상
-       highlightthickness=2 # 테두리 두께
-    )
-    radio1.grid(row=len(button_texts), column=0, pady=10, padx=10, sticky="w")  # 첫 번째 라디오 버튼
+    def select_pay_option(selected_btn, other_btn, option):
+        global pay_option
+        pay_option = option #착불, 현불
 
-    radio2 = tk.Radiobutton(
-        root,
-        text="현불",
-        font=("맑은고딕", 30),
-        variable=radio_var,
-        value="현불",
-        width=button_width // 20,  # Tkinter에서 width는 문자 단위
-        height=button_height // 20,  # Tkinter에서 height는 행 단위
-        relief="solid",  # 테두리 스타일 (solid: 실선)
-        highlightbackground="black",  # 테두리 색상
-        highlightthickness=2          # 테두리 두께
+        selected_btn.config(bg="black", foreground="white")
+        other_btn.config(bg="white", foreground="black")
+
+    print(f"[디버깅] button_width: {button_width}")
+    before_pay_btn = tk.Button(
+            root,
+            text="착불",
+            font=("맑은고딕", 30),
+            width=button_width // 10,  # Tkinter에서 width는 문자 단위
+            height=button_height // 20,  # Tkinter에서 height는 행 단위
+            # command=lambda num=i: button_action(num),
+            command=lambda: select_pay_option(before_pay_btn, after_pay_btn, "착불"),
+            relief="solid",  # 테두리 스타일 (solid: 실선)
+            highlightbackground="black",  # 테두리 색상
+            highlightthickness=2          # 테두리 두께
     )
-    radio2.grid(row=len(button_texts), column=0, pady=10, padx=10,sticky="e")  # 두 번째 라디오 버튼
+    before_pay_btn.grid(row=len(button_texts), column=0, pady=10, padx=10, sticky="nsew")  # 첫 번째 라디오 버튼
+
+    after_pay_btn = tk.Button(
+            root,
+            text="현불",
+            font=("맑은고딕", 30),
+            width=button_width // 10,  # Tkinter에서 width는 문자 단위
+            height=button_height // 20,  # Tkinter에서 height는 행 단위
+            # command=lambda num=i: button_action(num),
+            command=lambda: select_pay_option(after_pay_btn, before_pay_btn, "현불"),
+            relief="solid",  # 테두리 스타일 (solid: 실선)
+            highlightbackground="black",  # 테두리 색상
+            highlightthickness=2          # 테두리 두께
+    )
+    after_pay_btn.grid(row=len(button_texts), column=1, pady=10, padx=10, sticky="nsew")  # 첫 번째 라디오 버튼
+
+
+
+
 
     def get_saved_path():
         global saved_path
         saved_path = save_file.open_login_gui(root)
         print(f"[디버깅] saved_path: {saved_path}")
 
+
     # 선택된 옵션 출력 함수
     def show_selected_option():
-        global data_lst
+        global data_lst, pay_option
         ans = askyesno(title="제출 확인", message="제출하시겠습니까?")
 
         if ans:
+            complete_window = show_notification(root, "데이터 전송 중...")
+            root.update()
+
             print(f"\n====최종 데이터 출력===")
 
             for i in range(len(button_texts)):
                 print(f"[디버깅] {button_texts[i]}: {data_lst[i]}")
 
-            print(f"[디버깅] 결제 방식: {radio_var.get()}")
+            # print(f"[디버깅] 결제 방식: {radio_var.get()}")
+            print(f"[디버깅] 결제 방식: {pay_option}")
 
             # saved_path = save_file.show_path_gui(root)
             # print(f"[디버깅] saved_path: {saved_path}")
@@ -104,10 +121,18 @@ def make_gui(r):
             all_clear()
             func.filtering_noise(r)
 
-            messagebox.showinfo("Success", "성공적으로 제출되었습니다!")
+            # 로딩 인터페이스 추가
+            complete_window.destroy()
+            
+            show_msg_window = show_notification(root, "성공적으로 제출되었습니다!", "green")
+            root.update()
+            time.sleep(1.6)
+            show_msg_window.destroy()
+            # messagebox.showinfo("Success", "성공적으로 제출되었습니다!")
 
         else:
             print(f"[디버깅] 제출 취소")
+
 
     # 확인 버튼 생성 및 배치
     confirm_button = tk.Button(
@@ -122,7 +147,7 @@ def make_gui(r):
             highlightbackground="black",  # 테두리 색상
             highlightthickness=2          # 테두리 두께
         )
-    confirm_button.grid(row=len(button_texts) + 1, column=0, padx=10, pady=10, sticky="nsew")
+    confirm_button.grid(row=len(button_texts) + 1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
 
     # 그리드 행/열 확장 가능하도록 설정
@@ -130,7 +155,7 @@ def make_gui(r):
         root.grid_rowconfigure(i, weight=1)
     root.grid_columnconfigure(0, weight=1)
 
-    def show_notification(root, message):
+    def show_notification(root, message, color='black'):
         # Toplevel 창 생성
         notification_window = tk.Toplevel(root)
         notification_window.title("알림")
@@ -159,6 +184,7 @@ def make_gui(r):
         label = tk.Label(
             notification_window,
             text=message,
+            foreground=color,
             font=("맑은고딕", 35),
             wraplength=notification_width - 20  # 메시지 자동 줄바꿈
         )
@@ -230,6 +256,7 @@ def make_gui(r):
     def resize_buttons(event):
         new_width = event.width // 5  # 창 너비의 20%
         new_height = event.height // 20  # 창 높이의 5%
+
         for button in buttons:
             button.config(width=new_width // 10, height=new_height // 20)
 
@@ -241,7 +268,7 @@ def make_gui(r):
             buttons[i].config(text=f"{button_texts[i]}")
 
     def output_by_txt():
-        global saved_path
+        global saved_path, pay_option
 
         with open("saved_root.txt", "r", encoding="utf-8") as f:
             saved_path = f.readline()
@@ -249,14 +276,23 @@ def make_gui(r):
         print(f"[디버깅] output_bt_txt: 저장된 saved_path: {saved_path}")
 
         now = datetime.now()
+        folder_name = now.strftime("%Y년 %m월 %d일")
         file_name = now.strftime("%Y-%m-%d_%H;%M;%S") # 파일 이름
         date = now.strftime("%Y-%m-%d %H시%M분%S초") # 메모장에 적을 일자
 
         try:
             if saved_path == "":
-                save_root = file_name + ".txt"
+                
+                if not os.path.exists(folder_name):
+                    os.mkdir(folder_name)
+
+                save_root = folder_name + '/' + file_name + ".txt"
+
             else:
-                save_root = saved_path + '/' + file_name + ".txt"
+                if not os.path.exists(saved_path + '/' + folder_name):
+                    os.mkdir(saved_path + '/' + folder_name)
+
+                save_root = saved_path + '/' + folder_name + '/' + file_name + ".txt"
 
             with open (save_root, "w", encoding="utf-8") as file:
                 file.write(f"[일자]: {date}\n")
@@ -266,7 +302,8 @@ def make_gui(r):
                         file.write("\n")
 
                     file.write(f"[{button_texts[i]}]: {data_lst[i]}\n")
-                file.write(f"[결제 방식]: {radio_var.get()}\n")
+                # file.write(f"[결제 방식]: {radio_var.get()}\n")
+                file.write(f"[결제 방식]: {pay_option}\n")
             print(f"[디버깅] 데이터가 '{file_name}' 파일에 저장되었습니다.")
 
         except Exception as e:
