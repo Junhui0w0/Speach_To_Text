@@ -1,4 +1,4 @@
-# Speach To Text
+# Speech To Text
 
 **2025-02-25**  
 부모님 택배 사업에 도움이 될 수 있는 음성인식 프로그램  
